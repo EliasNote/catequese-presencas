@@ -18,13 +18,13 @@ func NewEncontroRepository(db *gorm.DB) *EncontroRepository {
 
 func (r *EncontroRepository) FindAll() ([]models.Encontro, error) {
 	var encontros []models.Encontro
-	result := r.db.Find(&encontros)
+	result := r.db.Preload("Catequista").Preload("Presencas").Find(&encontros)
 	return encontros, result.Error
 }
 
 func (r *EncontroRepository) FindByID(id uint) (models.Encontro, error) {
 	var encontro models.Encontro
-	result := r.db.First(&encontro, id)
+	result := r.db.Preload("Catequista").Preload("Presencas").First(&encontro, id)
 	return encontro, result.Error
 }
 
@@ -42,7 +42,11 @@ func (r *EncontroRepository) Create(input *models.CreateEncontroInput) (models.E
 	}
 
 	err = r.db.Create(&encontro).Error
-	return encontro, err
+	if err != nil {
+		return encontro, err
+	}
+
+	return r.FindByID(encontro.ID)
 }
 
 func (r *EncontroRepository) Update(id uint, input *models.UpdateEncontroInput) error {

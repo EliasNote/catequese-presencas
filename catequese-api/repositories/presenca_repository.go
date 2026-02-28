@@ -17,13 +17,13 @@ func NewPresencaRepository(db *gorm.DB) *PresencaRepository {
 
 func (r *PresencaRepository) FindAll() ([]models.Presenca, error) {
 	var presencas []models.Presenca
-	result := r.db.Find(&presencas)
+	result := r.db.Preload("Encontro").Preload("Catequizando").Find(&presencas)
 	return presencas, result.Error
 }
 
 func (r *PresencaRepository) FindByID(id uint) (models.Presenca, error) {
 	var presenca models.Presenca
-	result := r.db.First(&presenca, id)
+	result := r.db.Preload("Encontro").Preload("Catequizando").First(&presenca, id)
 	return presenca, result.Error
 }
 
@@ -35,7 +35,11 @@ func (r *PresencaRepository) Create(input *models.CreatePresencaInput) (models.P
 	}
 
 	err := r.db.Create(&presenca).Error
-	return presenca, err
+	if err != nil {
+		return presenca, err
+	}
+
+	return r.FindByID(presenca.ID)
 }
 
 func (r *PresencaRepository) Update(id uint, input *models.UpdatePresencaInput) error {

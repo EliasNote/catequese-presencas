@@ -17,7 +17,7 @@ func ConnectDatabase() *gorm.DB {
     }
     
     db.AutoMigrate(
-		&models.Catequista{},
+				&models.Comunidade{},
 		&models.Catequizando{},
 		&models.Encontro{},
 		&models.Presenca{},

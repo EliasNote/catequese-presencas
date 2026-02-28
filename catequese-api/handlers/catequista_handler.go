@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"catequese-api/auth"
 	"catequese-api/models"
 	"catequese-api/repositories"
 	"net/http"
@@ -88,4 +89,29 @@ func (h *CatequistaHandler) Delete(c *gin.Context) {
         return
     }
     c.JSON(http.StatusNoContent, nil)
+}
+
+func (h *CatequistaHandler) Login(c *gin.Context) {
+	var input models.LoginCatequistaInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	catequista, err := h.repository.FindByCredentials(input.Nome, input.Senha)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Nome ou senha inválidos"})
+		return
+	}
+
+    token, err := auth.GenerateToken(catequista)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar token"})
+        return
+    }
+
+    c.JSON(http.StatusOK, models.LoginCatequistaResponse{
+        Token:      token,
+        Catequista: catequista,
+    })
 }

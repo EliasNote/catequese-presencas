@@ -2,6 +2,7 @@ package routes
 
 import (
 	"catequese-api/handlers"
+	"catequese-api/middlewares"
 	"catequese-api/repositories"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,8 @@ import (
 func SetupRoutes(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
+	comunidadeRepo := repositories.NewComunidadeRepository(db)
+	comunidadeHandler := handlers.NewComunidadeHandler(comunidadeRepo)
 	catequistaRepo := repositories.NewCatequistaRepository(db)
 	catequistaHandler := handlers.NewCatequistaHandler(catequistaRepo)
 	catequizandoRepo := repositories.NewCatequizandoRepository(db)
@@ -22,7 +25,24 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 
 	api := r.Group("/api")
 	{
-		catequistas := api.Group("/catequistas")
+		catequistasPublic := api.Group("/catequistas")
+		{
+			catequistasPublic.POST("/login", catequistaHandler.Login)
+		}
+
+		protected := api.Group("")
+		protected.Use(middlewares.JWTAuthMiddleware())
+
+		comunidades := protected.Group("/comunidades")
+		{
+			comunidades.GET("", comunidadeHandler.GetAll)
+			comunidades.GET("/:id", comunidadeHandler.GetByID)
+			comunidades.POST("", comunidadeHandler.Create)
+			comunidades.PUT("/:id", comunidadeHandler.Update)
+			comunidades.DELETE("/:id", comunidadeHandler.Delete)
+		}
+
+		catequistas := protected.Group("/catequistas")
 		{
 			catequistas.GET("", catequistaHandler.GetAll)
 			catequistas.GET("/:id", catequistaHandler.GetByID)
@@ -31,7 +51,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 			catequistas.DELETE("/:id", catequistaHandler.Delete)
 		}
 
-		catequizandos := api.Group("/catequizandos")
+		catequizandos := protected.Group("/catequizandos")
 		{
 			catequizandos.GET("", catequizandoHandler.GetAll)
 			catequizandos.GET("/:id", catequizandoHandler.GetByID)
@@ -40,7 +60,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 			catequizandos.DELETE("/:id", catequizandoHandler.Delete)
 		}
 
-		encontros := api.Group("/encontros")
+		encontros := protected.Group("/encontros")
 		{
 			encontros.GET("", encontroHandler.GetAll)
 			encontros.GET("/:id", encontroHandler.GetByID)
@@ -49,7 +69,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 			encontros.DELETE("/:id", encontroHandler.Delete)
 		}
 
-		presencas := api.Group("/presencas")
+		presencas := protected.Group("/presencas")
 		{
 			presencas.GET("", presencaHandler.GetAll)
 			presencas.GET("/:id", presencaHandler.GetByID)

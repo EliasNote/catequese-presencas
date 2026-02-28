@@ -10,8 +10,10 @@ const (
 
 type Presenca struct {
 	ID             uint           `json:"id" gorm:"primary_key"`
-	EncontroId     uint           `json:"encontro_id"`
-	CatequizandoId uint           `json:"catequizando_id"`
+	EncontroId     uint           `json:"-"`
+	Encontro       *Encontro      `json:"encontro,omitempty"`
+	CatequizandoId uint           `json:"-"`
+	Catequizando   *Catequizando  `json:"catequizando,omitempty"`
 	Status         StatusPresenca `json:"status"`
 }
 
@@ -23,4 +25,20 @@ type CreatePresencaInput struct {
 
 type UpdatePresencaInput struct {
 	Status StatusPresenca `json:"status" binding:"required,oneof=presente falta justificada"`
+}
+
+type PresencaResponse struct {
+	ID           uint           `json:"id"`
+	Encontro     *Encontro      `json:"encontro,omitempty"`
+	Catequizando *Catequizando  `json:"catequizando,omitempty"`
+	Status       StatusPresenca `json:"status"`
+}
+
+func (p Presenca) ToResponse() PresencaResponse {
+	return PresencaResponse{
+		ID:           p.ID,
+		Encontro:     p.Encontro,
+		Catequizando: p.Catequizando,
+		Status:       p.Status,
+	}
 }

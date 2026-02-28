@@ -1,0 +1,361 @@
+{
+  "info": {
+    "name": "Catequese API",
+    "_postman_id": "catequese-api-collection",
+    "description": "Coleção de requisições para a API de controle de presenças do catecismo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Catequistas",
+      "item": [
+        {
+          "name": "Listar todos os catequistas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catequistas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequistas"]
+            }
+          }
+        },
+        {
+          "name": "Buscar catequista por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catequistas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequistas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Criar catequista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Maria Aparecida\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catequistas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequistas"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar catequista",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Maria Aparecida Silva\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catequistas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequistas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Deletar catequista",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catequistas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequistas", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catequizandos",
+      "item": [
+        {
+          "name": "Listar todos os catequizandos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catequizandos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequizandos"]
+            }
+          }
+        },
+        {
+          "name": "Buscar catequizando por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catequizandos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequizandos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Criar catequizando",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João da Silva\",\n  \"catequista_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catequizandos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequizandos"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar catequizando",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João da Silva Souza\",\n  \"catequista_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catequizandos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequizandos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Deletar catequizando",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catequizandos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catequizandos", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Encontros",
+      "item": [
+        {
+          "name": "Listar todos os encontros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/encontros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "encontros"]
+            }
+          }
+        },
+        {
+          "name": "Buscar encontro por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/encontros/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "encontros", "1"]
+            }
+          }
+        },
+        {
+          "name": "Criar encontro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": \"2026-03-01T09:00:00Z\",\n  \"tema\": \"Os Sacramentos\",\n  \"observacoes\": \"Levar o livro de catecismo\",\n  \"catequista_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/encontros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "encontros"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar encontro",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": \"2026-03-08T09:00:00Z\",\n  \"tema\": \"Os Sacramentos - Parte 2\",\n  \"observacoes\": \"Aula atualizada\",\n  \"catequista_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/encontros/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "encontros", "1"]
+            }
+          }
+        },
+        {
+          "name": "Deletar encontro",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/encontros/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "encontros", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Presenças",
+      "item": [
+        {
+          "name": "Listar todas as presenças",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/presencas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "presencas"]
+            }
+          }
+        },
+        {
+          "name": "Buscar presença por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/presencas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "presencas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Registrar presença",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encontro_id\": 1,\n  \"catequizando_id\": 1,\n  \"status\": \"presente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/presencas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "presencas"]
+            },
+            "description": "Status possíveis: \"presente\", \"falta\", \"justificada\""
+          }
+        },
+        {
+          "name": "Atualizar presença",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"justificada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/presencas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "presencas", "1"]
+            },
+            "description": "Status possíveis: \"presente\", \"falta\", \"justificada\""
+          }
+        },
+        {
+          "name": "Deletar presença",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/presencas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "presencas", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

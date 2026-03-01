@@ -28,7 +28,11 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("catequista_id", claims.CatequistaID)
+		c.Set("user_id", claims.UserID)
+		c.Set("role", claims.Role)
+		if claims.CatequistaID != nil {
+			c.Set("catequista_id", *claims.CatequistaID)
+		}
 		c.Set("catequista_nome", claims.Nome)
 		c.Next()
 	}

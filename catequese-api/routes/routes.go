@@ -14,8 +14,9 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 
 	comunidadeRepo := repositories.NewComunidadeRepository(db)
 	comunidadeHandler := handlers.NewComunidadeHandler(comunidadeRepo)
-	catequistaRepo := repositories.NewCatequistaRepository(db)
-	catequistaHandler := handlers.NewCatequistaHandler(catequistaRepo)
+	userRepo := repositories.NewUserRepository(db)
+	catequistaRepo := repositories.NewCatequistaRepository(db, userRepo)
+	catequistaHandler := handlers.NewCatequistaHandler(catequistaRepo, userRepo)
 	catequizandoRepo := repositories.NewCatequizandoRepository(db)
 	catequizandoHandler := handlers.NewCatequizandoHandler(catequizandoRepo)
 	encontroRepo := repositories.NewEncontroRepository(db)
@@ -32,23 +33,33 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 
 		protected := api.Group("")
 		protected.Use(middlewares.JWTAuthMiddleware())
+		adminOnly := protected.Group("")
+		adminOnly.Use(middlewares.AdminOnlyMiddleware())
 
 		comunidades := protected.Group("/comunidades")
 		{
 			comunidades.GET("", comunidadeHandler.GetAll)
 			comunidades.GET("/:id", comunidadeHandler.GetByID)
-			comunidades.POST("", comunidadeHandler.Create)
-			comunidades.PUT("/:id", comunidadeHandler.Update)
-			comunidades.DELETE("/:id", comunidadeHandler.Delete)
+		}
+
+		comunidadesAdmin := adminOnly.Group("/comunidades")
+		{
+			comunidadesAdmin.POST("", comunidadeHandler.Create)
+			comunidadesAdmin.PUT("/:id", comunidadeHandler.Update)
+			comunidadesAdmin.DELETE("/:id", comunidadeHandler.Delete)
 		}
 
 		catequistas := protected.Group("/catequistas")
 		{
 			catequistas.GET("", catequistaHandler.GetAll)
 			catequistas.GET("/:id", catequistaHandler.GetByID)
-			catequistas.POST("", catequistaHandler.Create)
-			catequistas.PUT("/:id", catequistaHandler.Update)
-			catequistas.DELETE("/:id", catequistaHandler.Delete)
+		}
+
+		catequistasAdmin := adminOnly.Group("/catequistas")
+		{
+			catequistasAdmin.POST("", catequistaHandler.Create)
+			catequistasAdmin.PUT("/:id", catequistaHandler.Update)
+			catequistasAdmin.DELETE("/:id", catequistaHandler.Delete)
 		}
 
 		catequizandos := protected.Group("/catequizandos")

@@ -10,17 +10,21 @@ import (
 )
 
 type Claims struct {
-	CatequistaID uint   `json:"catequista_id"`
+	UserID       uint  `json:"user_id"`
+	Role         string `json:"role"`
+	CatequistaID *uint  `json:"catequista_id,omitempty"`
 	Nome         string `json:"nome"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(catequista models.Catequista) (string, error) {
+func GenerateToken(user models.User, nome string) (string, error) {
 	secret := getJWTSecret()
 
 	claims := Claims{
-		CatequistaID: catequista.ID,
-		Nome:         catequista.Nome,
+		UserID:       user.ID,
+		Role:         user.Role,
+		CatequistaID: user.CatequistaID,
+		Nome:         nome,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

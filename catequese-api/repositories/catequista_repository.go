@@ -8,11 +8,12 @@ import (
 )
 
 type CatequistaRepository struct {
-	db *gorm.DB
+	db       *gorm.DB
+	userRepo *UserRepository
 }
 
-func NewCatequistaRepository(db *gorm.DB) *CatequistaRepository {
-	return &CatequistaRepository{db: db}
+func NewCatequistaRepository(db *gorm.DB, userRepo *UserRepository) *CatequistaRepository {
+	return &CatequistaRepository{db: db, userRepo: userRepo}
 }
 
 func (r *CatequistaRepository) FindAll() ([]models.Catequista, error) {
@@ -38,6 +39,24 @@ func (r *CatequistaRepository) Create(input *models.CreateCatequistaInput) (mode
 		return catequista, err
 	}
 
+	login := input.Login
+	if login == "" {
+		login = input.Nome
+	}
+
+	user := models.User{
+		Login:        login,
+		Senha:        input.Senha,
+		Role:         models.RoleCatequista,
+		Ativo:        true,
+		CatequistaID: &catequista.ID,
+	}
+
+	if err := r.userRepo.Create(&user); err != nil {
+		_ = r.db.Delete(&models.Catequista{}, catequista.ID).Error
+		return catequista, err
+	}
+
 	return r.FindByID(catequista.ID)
 }
 
@@ -55,15 +74,52 @@ func (r *CatequistaRepository) Update(id uint, input *models.UpdateCatequistaInp
 	if input.ComunidadeID != 0 {
 		catequista.ComunidadeID = input.ComunidadeID
 	}
-	return r.db.Save(&catequista).Error
+
+	if err := r.db.Save(&catequista).Error; err != nil {
+		return err
+	}
+
+	user, err := r.userRepo.FindByCatequistaID(id)
+	if err != nil {
+		login := input.Login
+		if login == "" {
+			if input.Nome != "" {
+				login = input.Nome
+			} else {
+				login = catequista.Nome
+			}
+		}
+
+		senha := input.Senha
+		if senha == "" {
+			senha = catequista.Senha
+		}
+
+		newUser := models.User{
+			Login:        login,
+			Senha:        senha,
+			Role:         models.RoleCatequista,
+			Ativo:        true,
+			CatequistaID: &catequista.ID,
+		}
+		return r.userRepo.Create(&newUser)
+	}
+
+	if input.Login != "" {
+		user.Login = input.Login
+	} else if input.Nome != "" {
+		user.Login = input.Nome
+	}
+	if input.Senha != "" {
+		user.Senha = input.Senha
+	}
+
+	return r.userRepo.Update(&user)
 }
 
 func (r *CatequistaRepository) Delete(id uint) error {
-    return r.db.Delete(&models.Catequista{}, id).Error
-}
-
-func (r *CatequistaRepository) FindByCredentials(nome, senha string) (models.Catequista, error) {
-	var catequista models.Catequista
-	result := r.db.Where("nome = ? AND senha = ?", nome, senha).First(&catequista)
-	return catequista, result.Error
+	if err := r.userRepo.DeleteByCatequistaID(id); err != nil {
+		return err
+	}
+	return r.db.Delete(&models.Catequista{}, id).Error
 }

@@ -12,10 +12,11 @@ import (
 
 type CatequistaHandler struct {
 	repository *repositories.CatequistaRepository
+    userRepo   *repositories.UserRepository
 }
 
-func NewCatequistaHandler(repository *repositories.CatequistaRepository) *CatequistaHandler {
-	return &CatequistaHandler{repository: repository}
+func NewCatequistaHandler(repository *repositories.CatequistaRepository, userRepo *repositories.UserRepository) *CatequistaHandler {
+    return &CatequistaHandler{repository: repository, userRepo: userRepo}
 }
 
 func (h *CatequistaHandler) GetAll(c *gin.Context) {
@@ -98,13 +99,32 @@ func (h *CatequistaHandler) Login(c *gin.Context) {
 		return
 	}
 
-	catequista, err := h.repository.FindByCredentials(input.Nome, input.Senha)
+    login := input.Login
+    if login == "" {
+        login = input.Nome
+    }
+
+    user, err := h.userRepo.FindByCredentials(login, input.Senha)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Nome ou senha inválidos"})
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Login ou senha inválidos"})
 		return
 	}
 
-    token, err := auth.GenerateToken(catequista)
+    catequista := models.Catequista{}
+    if user.CatequistaID != nil {
+        catequista, err = h.repository.FindByID(*user.CatequistaID)
+        if err != nil {
+            c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário sem catequista válido"})
+            return
+        }
+    }
+
+    nomeToken := user.Login
+    if catequista.ID != 0 {
+        nomeToken = catequista.Nome
+    }
+
+    token, err := auth.GenerateToken(user, nomeToken)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar token"})
         return
@@ -112,6 +132,7 @@ func (h *CatequistaHandler) Login(c *gin.Context) {
 
     c.JSON(http.StatusOK, models.LoginCatequistaResponse{
         Token:      token,
+        Role:       user.Role,
         Catequista: catequista,
     })
 }

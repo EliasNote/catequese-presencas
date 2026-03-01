@@ -12,22 +12,26 @@ type Catequista struct {
 
 type CreateCatequistaInput struct {
 	Nome         string `json:"nome" binding:"required"`
+	Login        string `json:"login"`
 	Senha        string `json:"senha" binding:"required"`
 	ComunidadeID uint   `json:"comunidade_id"`
 }
 
 type LoginCatequistaInput struct {
-	Nome  string `json:"nome" binding:"required"`
+	Login string `json:"login" binding:"required_without=Nome"`
+	Nome  string `json:"nome" binding:"required_without=Login"`
 	Senha string `json:"senha" binding:"required"`
 }
 
 type LoginCatequistaResponse struct {
 	Token      string     `json:"token"`
+	Role       string     `json:"role"`
 	Catequista Catequista `json:"catequista"`
 }
 
 type UpdateCatequistaInput struct {
 	Nome         string `json:"nome"`
+	Login        string `json:"login"`
 	Senha        string `json:"senha"`
 	ComunidadeID uint   `json:"comunidade_id"`
 }

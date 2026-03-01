@@ -16,7 +16,8 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 	comunidadeHandler := handlers.NewComunidadeHandler(comunidadeRepo)
 	userRepo := repositories.NewUserRepository(db)
 	catequistaRepo := repositories.NewCatequistaRepository(db, userRepo)
-	catequistaHandler := handlers.NewCatequistaHandler(catequistaRepo, userRepo)
+	catequistaHandler := handlers.NewCatequistaHandler(catequistaRepo)
+	authHandler := handlers.NewAuthHandler(userRepo, catequistaRepo)
 	catequizandoRepo := repositories.NewCatequizandoRepository(db)
 	catequizandoHandler := handlers.NewCatequizandoHandler(catequizandoRepo)
 	encontroRepo := repositories.NewEncontroRepository(db)
@@ -26,9 +27,9 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 
 	api := r.Group("/api")
 	{
-		catequistasPublic := api.Group("/catequistas")
+		authRoutes := api.Group("/auth")
 		{
-			catequistasPublic.POST("/login", catequistaHandler.Login)
+			authRoutes.POST("/login", authHandler.Login)
 		}
 
 		protected := api.Group("")

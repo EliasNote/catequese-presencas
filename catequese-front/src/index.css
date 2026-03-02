@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+  
+  --color-vatican-gold: #FFCC00;
+  --color-vatican-red: #8B0000;
+  --color-vatican-cream: #F8F7F2;
+  --color-vatican-paper: #FFFFFF;
+}
+
+@layer base {
+  body {
+    @apply bg-vatican-cream text-slate-900;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}

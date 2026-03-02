@@ -5,6 +5,8 @@ import (
 	"catequese-api/middlewares"
 	"catequese-api/models"
 	"catequese-api/repositories"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -12,6 +14,7 @@ import (
 
 func SetupRoutes(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	r.Use(corsMiddleware())
 
 	comunidadeRepo := repositories.NewComunidadeRepository(db)
 	comunidadeHandler := handlers.NewComunidadeHandler(comunidadeRepo)
@@ -96,4 +99,28 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 	}
 
 	return r
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	allowedOrigins := map[string]bool{
+		"https://catequese-presencas.pages.dev": true,
+	}
+
+	return func(c *gin.Context) {
+		origin := strings.TrimSuffix(c.GetHeader("Origin"), "/")
+		if allowedOrigins[origin] {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Vary", "Origin")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		}
+
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	}
 }

@@ -3,6 +3,7 @@ package routes
 import (
 	"catequese-api/handlers"
 	"catequese-api/middlewares"
+	"catequese-api/models"
 	"catequese-api/repositories"
 
 	"github.com/gin-gonic/gin"
@@ -34,8 +35,11 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 
 		protected := api.Group("")
 		protected.Use(middlewares.JWTAuthMiddleware())
+		protected.Use(middlewares.RequireRoles(models.RoleAdmin, models.RoleCatequista))
 		adminOnly := protected.Group("")
 		adminOnly.Use(middlewares.AdminOnlyMiddleware())
+		catequistaAccess := protected.Group("")
+		catequistaAccess.Use(middlewares.RequireRoles(models.RoleCatequista, models.RoleAdmin))
 
 		comunidades := protected.Group("/comunidades")
 		{
@@ -63,7 +67,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 			catequistasAdmin.DELETE("/:id", catequistaHandler.Delete)
 		}
 
-		catequizandos := protected.Group("/catequizandos")
+		catequizandos := catequistaAccess.Group("/catequizandos")
 		{
 			catequizandos.GET("", catequizandoHandler.GetAll)
 			catequizandos.GET("/:id", catequizandoHandler.GetByID)
@@ -72,7 +76,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 			catequizandos.DELETE("/:id", catequizandoHandler.Delete)
 		}
 
-		encontros := protected.Group("/encontros")
+		encontros := catequistaAccess.Group("/encontros")
 		{
 			encontros.GET("", encontroHandler.GetAll)
 			encontros.GET("/:id", encontroHandler.GetByID)
@@ -81,7 +85,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 			encontros.DELETE("/:id", encontroHandler.Delete)
 		}
 
-		presencas := protected.Group("/presencas")
+		presencas := catequistaAccess.Group("/presencas")
 		{
 			presencas.GET("", presencaHandler.GetAll)
 			presencas.GET("/:id", presencaHandler.GetByID)

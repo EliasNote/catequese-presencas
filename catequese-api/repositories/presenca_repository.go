@@ -28,6 +28,20 @@ func (r *PresencaRepository) FindByID(id uint) (models.Presenca, error) {
 }
 
 func (r *PresencaRepository) Create(input *models.CreatePresencaInput) (models.Presenca, error) {
+	var encontro models.Encontro
+	if err := r.db.First(&encontro, input.EncontroId).Error; err != nil {
+		return models.Presenca{}, errors.New("Encontro não encontrado")
+	}
+
+	var catequizando models.Catequizando
+	if err := r.db.First(&catequizando, input.CatequizandoId).Error; err != nil {
+		return models.Presenca{}, errors.New("Catequizando não encontrado")
+	}
+
+	if encontro.CatequistaId != catequizando.CatequistaID {
+		return models.Presenca{}, errors.New("Encontro e catequizando devem pertencer ao mesmo catequista")
+	}
+
 	presenca := models.Presenca{
 		EncontroId:     input.EncontroId,
 		CatequizandoId: input.CatequizandoId,

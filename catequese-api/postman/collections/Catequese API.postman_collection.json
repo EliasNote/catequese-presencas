@@ -505,6 +505,18 @@
         }
       ],
       "id": "5200a732-54ee-496b-bc6f-47a2bb0392d4"
+    },
+    {
+      "name": "New Request",
+      "id": "8d9eaa75-83e1-4393-8616-2c0a12e6eb2d",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
     }
   ],
   "variable": [

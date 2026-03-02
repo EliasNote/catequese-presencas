@@ -3,6 +3,7 @@ package handlers
 import (
 	"catequese-api/models"
 	"catequese-api/repositories"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -71,7 +72,16 @@ func (h *CatequizandoHandler) Update(c *gin.Context) {
 
 	err = h.repository.Update(uint(id), &input)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		switch {
+		case errors.Is(err, repositories.ErrNenhumCampoParaAtualizar):
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		case errors.Is(err, repositories.ErrCatequistaNotFound):
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		case errors.Is(err, repositories.ErrCatequizandoNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 	c.Status(http.StatusOK)

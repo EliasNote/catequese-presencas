@@ -11,6 +11,12 @@ type CatequizandoRepository struct {
 	db *gorm.DB
 }
 
+var (
+	ErrCatequizandoNotFound     = errors.New("Catequizando não encontrado")
+	ErrCatequistaNotFound       = errors.New("Catequista não encontrado")
+	ErrNenhumCampoParaAtualizar = errors.New("Nenhum campo válido para atualização")
+)
+
 func NewCatequizandoRepository(db *gorm.DB) *CatequizandoRepository {
 	return &CatequizandoRepository{db: db}
 }
@@ -41,21 +47,35 @@ func (r *CatequizandoRepository) Create(input *models.CreateCatequizandoInput) (
 }
 
 func (r *CatequizandoRepository) Update(id uint, input *models.UpdateCatequizandoInput) error {
-	catequizando, err := r.FindByID(id)
-	if err != nil {
-		return errors.New("Catequizando não encontrado")
-	}
-
 	updates := map[string]interface{}{}
 
 	if input.Nome != "" {
 		updates["nome"] = input.Nome
 	}
 	if input.CatequistaID != 0 {
+		var catequista models.Catequista
+		if err := r.db.First(&catequista, input.CatequistaID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return ErrCatequistaNotFound
+			}
+			return err
+		}
 		updates["catequista_id"] = input.CatequistaID
 	}
 
-	return r.db.Model(&catequizando).Updates(updates).Error
+	if len(updates) == 0 {
+		return ErrNenhumCampoParaAtualizar
+	}
+
+	result := r.db.Model(&models.Catequizando{}).Where("id = ?", id).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrCatequizandoNotFound
+	}
+
+	return nil
 }
 
 func (r *CatequizandoRepository) Delete(id uint) error {

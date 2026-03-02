@@ -46,14 +46,16 @@ func (r *CatequizandoRepository) Update(id uint, input *models.UpdateCatequizand
 		return errors.New("Catequizando não encontrado")
 	}
 
+	updates := map[string]interface{}{}
+
 	if input.Nome != "" {
-		catequizando.Nome = input.Nome
+		updates["nome"] = input.Nome
 	}
 	if input.CatequistaID != 0 {
-		catequizando.CatequistaID = input.CatequistaID
+		updates["catequista_id"] = input.CatequistaID
 	}
 
-	return r.db.Save(&catequizando).Error
+	return r.db.Model(&catequizando).Updates(updates).Error
 }
 
 func (r *CatequizandoRepository) Delete(id uint) error {
